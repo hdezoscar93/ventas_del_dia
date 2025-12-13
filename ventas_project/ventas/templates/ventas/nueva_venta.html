@@ -1,0 +1,66 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Registrar Venta{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4 class="mb-0"><i class="bi bi-cart-plus"></i> Registrar Venta de Hoy</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label">¿Qué vendiste? *</label>
+                        <input type="text" class="form-control" name="descripcion" 
+                               placeholder="Ej: 5 carritos, 3 muñecas, 2 pelotas" required>
+                        <div class="form-text">
+                            Describe lo que vendiste en pocas palabras
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Cantidad *</label>
+                            <input type="number" class="form-control" name="cantidad" 
+                                   min="1" value="1" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Precio Unitario *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                <input type="number" class="form-control" name="precio_unitario" 
+                                       min="0" step="0.01" placeholder="0.00" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <strong>Información automática:</strong><br>
+                        • Categoría: Juguete<br>
+                        • Método de pago: Efectivo<br>
+                        • Pago: Realizado<br>
+                        • Fecha y hora: Ahora mismo
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-check-circle"></i> Guardar Venta
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="card-footer text-muted small">
+                <i class="bi bi-info-circle"></i> La venta se registrará con fecha y hora actual, y el total se calculará automáticamente
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

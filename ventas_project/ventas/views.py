@@ -222,29 +222,38 @@ def dashboard(request):
         'form': form,
     })
 
+@login_required
 def nueva_venta(request):
     if request.method == 'POST':
         nombre_producto = request.POST.get('descripcion')
         cantidad = request.POST.get('cantidad')
         precio_unitario = request.POST.get('precio_unitario')
 
-        
-        # Validaciones básicas
         if not nombre_producto or not cantidad or not precio_unitario:
             messages.error(request, 'Por favor completa todos los campos')
             return redirect('dashboard')
-        
-        # Crear la venta con valores por defecto
+
+        try:
+            cantidad = float(cantidad)
+            precio_unitario = float(precio_unitario)
+        except ValueError:
+            messages.error(request, 'Cantidad y precio deben ser valores numéricos')
+            return redirect('dashboard')
+
         venta = Venta.objects.create(
             usuario=request.user,
             nombre_producto=nombre_producto,
-            cantidad=int(cantidad),
-            precio_unitario=float(precio_unitario),
+            cantidad=cantidad,
+            precio_unitario=precio_unitario,
             metodo_pago='efectivo',
             fecha_registro=timezone.now()
         )
-        
-        messages.success(request, f'Venta registrada: ${float(venta.total):.2f}')
+
+        # Texto dinámico
+        tipo = "Egreso" if venta.total < 0 else "Ingreso"
+        color = "🔴" if venta.total < 0 else "🟢"
+
+        messages.success(request, f'{color} {tipo} registrado: ${venta.total:.2f}')
         return redirect('dashboard')
-    
+
     return render(request, 'ventas/nueva_venta.html')

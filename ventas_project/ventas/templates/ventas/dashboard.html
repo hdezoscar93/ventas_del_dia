@@ -1,82 +1,100 @@
 {% extends 'base/base.html' %}
 
-{% block title %}Dashboard - Ventas del Día{% endblock %}
+{% block title %}Dashboard - Ventas{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-12">
-        <h2 class="mb-4">Dashboard - {{ fecha|date:"d/m/Y" }}</h2>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-4">
-        <div class="card text-white bg-success">
-            <div class="card-body">
-                <h5 class="card-title">Ventas Hoy</h5>
-                <p class="card-text display-6">${{ total_dia|floatformat:2 }}</p>
-                <p class="card-text">{{ total_ventas }} transacciones</p>
-            </div>
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <h2 class="mb-4">Dashboard - {{ fecha|date:"d/m/Y" }}</h2>
         </div>
     </div>
 
+    <!-- 🔹 Formulario de filtro por rango de fechas -->
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-4">
+            <label for="fecha_inicio" class="form-label">Fecha inicio</label>
+            <input type="date" id="fecha_inicio" name="fecha_inicio" class="form-control"
+                   value="{{ request.GET.fecha_inicio }}">
+        </div>
+        <div class="col-md-4">
+            <label for="fecha_fin" class="form-label">Fecha fin</label>
+            <input type="date" id="fecha_fin" name="fecha_fin" class="form-control"
+                   value="{{ request.GET.fecha_fin }}">
+        </div>
+        <div class="col-md-4 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+        </div>
+    </form>
 
-    <div class="col-md-4">
-        <div class="card text-white bg-info">
-            <div class="card-body">
-                <h5 class="card-title">Acciones Rápidas</h5>
-                <div class="d-grid gap-2">
-                    <a href="{% url 'nueva_venta' %}" class="btn btn-light">Nueva Venta</a>
+    <!-- 🔹 Tarjetas resumen -->
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Ventas en rango</h5>
+                    <p class="card-text display-6">${{ total_dia|floatformat:2 }}</p>
+                    <p class="card-text">{{ total_ventas }} transacciones</p>
+                </div>
+            </div>
+        </div>
 
+        <div class="col-md-4">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Acciones Rápidas</h5>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'nueva_venta' %}" class="btn btn-light">💰 Nueva Venta</a>
+                        <a href="{% url 'nuevo_egreso' %}" class="btn btn-danger">💸 Registrar Egreso</a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="row mt-4">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-header">
-                <h5>Ventas Recientes de Hoy</h5>
-            </div>
-            <div class="card-body">
-
-                {% if ventas %}
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>producto</th>
-                                <th>Hora</th>
-                                <th>Unidades</th>
-                                <th>precio unitario</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for venta in ventas %}
-                            <tr>
-                                <td>#{{ venta.id }}</td>
-                                <td>{{ venta.nombre_producto }}</td>
-                                <td>{{ venta.fecha_registro|date:"H:i" }}</td>
-                                <td>{{venta.cantidad }}</td>
-                                <td>{{venta.precio_unitario }}</td>
-                                <td class="{% if venta.total < 0 %}text-danger{% else %}text-success{% endif %}">
-                                    ${{ venta.total|floatformat:2 }}
-                                </td>
-
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+    <!-- 🔹 Tabla de ventas -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Ventas Recientes{% if request.GET.fecha_inicio and request.GET.fecha_fin %} entre
+                        {{ request.GET.fecha_inicio }} y {{ request.GET.fecha_fin }}{% else %} de Hoy{% endif %}</h5>
                 </div>
-                {% else %}
-                <p class="text-center text-muted">No hay ventas registradas hoy.</p>
-                {% endif %}
+                <div class="card-body">
+
+                    {% if ventas %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Producto</th>
+                                    <th>Hora</th>
+                                    <th>Unidades</th>
+                                    <th>Precio unitario</th>
+                                    <th>Total</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for venta in ventas %}
+                                    <tr>
+                                        <td>#{{ venta.id }}</td>
+                                        <td>{{ venta.nombre_producto }}</td>
+                                        <td>{{ venta.fecha_registro|date:"d/m/Y H:i" }}</td>
+                                        <td>{{ venta.cantidad }}</td>
+                                        <td>${{ venta.precio_unitario|floatformat:2 }}</td>
+                                        <td class="{% if venta.total < 0 %}text-danger{% else %}text-success{% endif %}">
+                                            ${{ venta.total|floatformat:2 }}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center text-muted">No hay ventas registradas en este rango.</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}

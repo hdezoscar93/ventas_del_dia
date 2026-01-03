@@ -1,0 +1,29 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Registrar Egreso{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4 text-danger">💸 Registrar Egreso</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="descripcion" class="form-label">Descripción del egreso</label>
+            <input type="text" name="descripcion" id="descripcion" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="cantidad" class="form-label">Cantidad</label>
+            <input type="number" name="cantidad" id="cantidad" class="form-control" step="1" min="1" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="precio_unitario" class="form-label">Monto por unidad ($)</label>
+            <input type="number" name="precio_unitario" id="precio_unitario" class="form-control" step="0.01" required>
+        </div>
+
+        <button type="submit" class="btn btn-danger w-100">Registrar Egreso</button>
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary w-100 mt-2">Cancelar</a>
+    </form>
+</div>
+{% endblock %}
